@@ -178,7 +178,8 @@
         const originalId = getUrlParameter('originalId');
         const prefilledEmail = getUrlParameter('email');
         const prefilledName = getUrlParameter('name');
-        
+        const prefilledCompany = getUrlParameter('company');
+        const prefilledMessage = getUrlParameter('message');
         if (isResubmit) {
             // Show resubmit notice
             document.getElementById('resubmitNotice').style.display = 'block';
