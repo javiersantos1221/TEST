@@ -100,127 +100,6 @@
            margin-top: 20px;
            font-size: 14px;
        }
-
-       /* Popup Modal Styles */
-       .modal-overlay {
-           position: fixed;
-           top: 0;
-           left: 0;
-           width: 100%;
-           height: 100%;
-           background-color: rgba(0, 0, 0, 0.5);
-           display: flex;
-           justify-content: center;
-           align-items: center;
-           z-index: 1000;
-       }
-
-       .modal-content {
-           background-color: #2d3748;
-           color: white;
-           padding: 24px;
-           border-radius: 8px;
-           max-width: 500px;
-           width: 90%;
-           max-height: 80vh;
-           overflow-y: auto;
-           position: relative;
-       }
-
-       .modal-header {
-           font-size: 20px;
-           font-weight: 600;
-           margin-bottom: 16px;
-       }
-
-       .modal-status {
-           display: flex;
-           align-items: center;
-           gap: 8px;
-           margin-bottom: 16px;
-       }
-
-       .success-icon {
-           color: #48bb78;
-           font-size: 18px;
-       }
-
-       .error-icon {
-           color: #f56565;
-           font-size: 18px;
-       }
-
-       .modal-body {
-           color: #cbd5e0;
-           line-height: 1.6;
-           margin-bottom: 24px;
-       }
-
-       .modal-checklist {
-           margin-top: 16px;
-       }
-
-       .checklist-header {
-           display: flex;
-           align-items: center;
-           gap: 8px;
-           margin-bottom: 8px;
-       }
-
-       .checklist-bullet {
-           width: 8px;
-           height: 8px;
-           background-color: #3182ce;
-           border-radius: 50%;
-           display: inline-block;
-           margin-right: 8px;
-       }
-
-       .checklist-item {
-           color: #cbd5e0;
-           margin-left: 16px;
-           margin-bottom: 4px;
-       }
-
-       .modal-footer {
-           display: flex;
-           justify-content: flex-end;
-       }
-
-       .modal-button {
-           background-color: #3182ce;
-           color: white;
-           padding: 10px 24px;
-           border: none;
-           border-radius: 4px;
-           font-weight: 600;
-           cursor: pointer;
-           transition: background-color 0.2s;
-       }
-
-       .modal-button:hover {
-           background-color: #2c5282;
-       }
-
-       .modal-close {
-           position: absolute;
-           top: 8px;
-           right: 12px;
-           background: none;
-           border: none;
-           color: #a0aec0;
-           font-size: 20px;
-           cursor: pointer;
-           padding: 4px;
-       }
-
-       .modal-close:hover {
-           color: white;
-       }
-
-       .hidden {
-           display: none;
-       }
    </style>
 </head>
 <body>
@@ -280,68 +159,7 @@
        </div>
    </div>
 
-   <!-- Success Modal -->
-   <div id="successModal" class="modal-overlay hidden">
-       <div class="modal-content">
-           <button class="modal-close" onclick="closeModal('successModal')">&times;</button>
-           <div class="modal-header">This page says</div>
-           <div class="modal-status">
-               <span class="success-icon">✅</span>
-               <span style="color: #48bb78; font-weight: 600;">Success!</span>
-           </div>
-           <div class="modal-body">
-               <p>Thank you! Your form has been submitted successfully. You will receive an email confirmation once it has been reviewed and approved by our admin team (usually within 24 hours).</p>
-               <div class="modal-checklist">
-                   <div class="checklist-header">
-                       <div class="checklist-bullet"></div>
-                       <span style="font-weight: 600;">Now check:</span>
-                   </div>
-                   <div class="checklist-item">• Your email for the approval request</div>
-                   <div class="checklist-item">• Your Google Sheet for the new row</div>
-                   <div class="checklist-item">• Make sure to activate the admin webhook before clicking approve/reject!</div>
-               </div>
-           </div>
-           <div class="modal-footer">
-               <button class="modal-button" onclick="closeModal('successModal')">OK</button>
-           </div>
-       </div>
-   </div>
-
-   <!-- Error Modal -->
-   <div id="errorModal" class="modal-overlay hidden">
-       <div class="modal-content">
-           <button class="modal-close" onclick="closeModal('errorModal')">&times;</button>
-           <div class="modal-header">This page says</div>
-           <div class="modal-status">
-               <span class="error-icon">❌</span>
-               <span style="color: #f56565; font-weight: 600;">Error</span>
-           </div>
-           <div class="modal-body">
-               <p id="errorMessage">An error occurred while submitting the form.</p>
-           </div>
-           <div class="modal-footer">
-               <button class="modal-button" onclick="closeModal('errorModal')">OK</button>
-           </div>
-       </div>
-   </div>
-
    <script>
-       // Modal functions
-       function showModal(modalId) {
-           document.getElementById(modalId).classList.remove('hidden');
-       }
-
-       function closeModal(modalId) {
-           document.getElementById(modalId).classList.add('hidden');
-       }
-
-       // Close modal when clicking outside
-       document.addEventListener('click', function(e) {
-           if (e.target.classList.contains('modal-overlay')) {
-               closeModal(e.target.id);
-           }
-       });
-
        // Generate unique ID when page loads
        function generateId() {
            return 'form-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
@@ -362,7 +180,6 @@
        const prefilledName = getUrlParameter('name');
        const prefilledCompany = getUrlParameter('company');
        const prefilledMessage = getUrlParameter('message');
-       
        if (isResubmit) {
            // Show resubmit notice
            document.getElementById('resubmitNotice').style.display = 'block';
@@ -420,8 +237,13 @@
                const result = await response.text();
                
                if (response.ok) {
-                   // Show success modal instead of alert
-                   showModal('successModal');
+                   let message = '✅ Success!\n\n' + result;
+                   if (isResubmit) {
+                       message += '\n\n🔄 Your form has been resubmitted for review.';
+                   }
+                   message += '\n\n🔍 Now check:\n• Your email for the approval request\n• Your Google Sheet for the new row\n• Make sure to activate the admin webhook before clicking approve/reject!';
+                   
+                   alert(message);
                    
                    // Generate new ID for next test
                    document.getElementById('id').value = generateId();
@@ -433,24 +255,10 @@
                    document.getElementById('company').value = '';
                    document.getElementById('message').value = '';
                } else {
-                   // Show error modal with specific message
-                   document.getElementById('errorMessage').innerHTML = 
-                       `<strong>Error:</strong> ${result}<br><br>` +
-                       `<strong>Please check:</strong><br>` +
-                       `• Your n8n workflow is active<br>` +
-                       `• The webhook URL is correct<br>` +
-                       `• Make sure your webhook is listening!`;
-                   showModal('errorModal');
+                   alert('❌ Error: ' + result + '\n\nMake sure your n8n webhook is activated and listening!');
                }
            } catch (error) {
-               // Show error modal for network errors
-               document.getElementById('errorMessage').innerHTML = 
-                   `<strong>Network Error:</strong> ${error.message}<br><br>` +
-                   `<strong>Please check:</strong><br>` +
-                   `• Your n8n workflow is active<br>` +
-                   `• The webhook URL is correct<br>` +
-                   `• Your internet connection is working`;
-               showModal('errorModal');
+               alert('❌ Network Error: ' + error.message + '\n\nCheck that:\n• Your n8n workflow is active\n• The webhook URL is correct\n• Your internet connection is working');
            } finally {
                submitBtn.textContent = originalText;
                submitBtn.disabled = false;
